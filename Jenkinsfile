@@ -1,7 +1,7 @@
 pipeline {
     agent { label 'Jenkins-agent' }
     environment {
-        VENV_DIR = "${WORKSPACE}/venv"
+        DOCKER_IMAGE = 'flask-image-editor:latest'
     }   
     stages {
         stage("Cleanup Workspace") {
@@ -14,28 +14,22 @@ pipeline {
                 git branch: 'main', credentialsId: 'GitHub', url: 'https://github.com/JaydeepDebnath/flask-image-editor'
             }
         }
-        stage("Setup Python Environment") {
-            steps {
-                sh '''
-                python3 -m venv $VENV_DIR
-                source $VENV_DIR/bin/activate
-                pip install --upgrade pip
-                pip install -r requirements.txt
-                '''
-            }
-        }
-        stage("Run Tests") {
-            steps {
-                sh '''
-                source $VENV_DIR/bin/activate
-                pytest
-                '''
-            }
-        }
         stage("Build Docker Image") {
             steps {
                 sh '''
-                docker build -t flask-image-editor:latest .
+                docker build -t $DOCKER_IMAGE .
+                '''
+            }
+        }
+        stage("RUN Test in Docker"){
+            steps{
+                sh '''
+                docker run --rm \
+                -e FLASK_APP=main.py \
+                -e FLASK_RUN_HOST=0.0.0.0 \
+                -e FLASK_ENV=production \
+                -e FLASK_DEBUG=0 \
+                $DOCKER_IMAGE pytest
                 '''
             }
         }
