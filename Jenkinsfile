@@ -21,15 +21,10 @@ pipeline {
                 '''
             }
         }
-        stage("RUN Test in Docker"){
+        stage("RUN Flask app"){
             steps{
                 sh '''
-                docker run --rm \
-                -e FLASK_APP=main.py \
-                -e FLASK_RUN_HOST=0.0.0.0 \
-                -e FLASK_ENV=production \
-                -e FLASK_DEBUG=0 \
-                $DOCKER_IMAGE pytest
+                docker run -d -p 5000:5000 $DOCKER_IMAGE
                 '''
             }
         }
