@@ -1,9 +1,8 @@
 pipeline {
     agent { label 'Jenkins-agent' }
-    tools {
-        jdk 'Java17'
-        maven 'Maven3'
-    }
+    environment {
+        VENV_DIR = 'venv'
+    }   
     stages {
         stage("Cleanup Workspace") {
             steps {
@@ -15,14 +14,29 @@ pipeline {
                 git branch: 'main', credentialsId: 'GitHub', url: 'https://github.com/JaydeepDebnath/flask-image-editor'
             }
         }
-        stage("Build Application") {
+        stage("Setup Python Environment") {
             steps {
-                sh 'mvn clean package'
+                sh '''
+                python3 -m venv $VENV_DIR
+                source $VENV_DIR/bin/activate
+                pip install --upgrade pip
+                pip install -r requirements.txt
+                '''
             }
         }
-        stage("Test Application") {
+        stage("Run Tests") {
             steps {
-                sh 'mvn test'
+                sh '''
+                source $VENV_DIR/bin/activate
+                pytest
+                '''
+            }
+        }
+        stage("Build Docker Image") {
+            steps {
+                sh '''
+                docker build -t flask-image-editor:latest .
+                '''
             }
         }
     }
