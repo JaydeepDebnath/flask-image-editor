@@ -1,7 +1,7 @@
 pipeline {
     agent { label 'Jenkins-agent' }
     environment {
-        VENV_DIR = 'venv'
+        VENV_DIR = "${WORKSPACE}/venv"
     }   
     stages {
         stage("Cleanup Workspace") {
