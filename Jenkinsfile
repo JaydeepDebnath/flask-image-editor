@@ -1,7 +1,8 @@
 pipeline {
     agent { label 'Jenkins-agent' }
     environment {
-        DOCKER_IMAGE = 'flask-image-editor:latest'
+        DOCKER_IMAGE = 'flask-image-editor'
+        SONARQUBE_ENV = 'SonarQube'
     }   
     stages {
         stage("Cleanup Workspace") {
@@ -12,6 +13,19 @@ pipeline {
         stage("Checkout from SCM") {
             steps {
                 git branch: 'main', credentialsId: 'GitHub', url: 'https://github.com/JaydeepDebnath/flask-image-editor'
+            }
+        }
+        stage("SonarQube code Analysis"){
+            steps{
+                withSonarQubeEnv('SonarQube'){
+                    sh '''
+                    sonar-scaner \
+                    -Dsonar.projectKey=$DOCKER_IMAGE \
+                    -Dsonar.sources=.\
+                    -Dsonar.language=py \
+                    -Dsonar.sourceEncoding=UTF-8
+                    '''
+                }  
             }
         }
         stage("Build Docker Image") {
