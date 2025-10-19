@@ -2,6 +2,7 @@ pipeline {
     agent { label 'Jenkins-agent' }
     environment {
         DOCKER_IMAGE = 'flask-image-editor'
+        SONAR_TOKEN = credentials('SonarQube')
     }   
     stages {
         stage("Cleanup Workspace") {
@@ -22,6 +23,8 @@ pipeline {
                         sh "${scannerHome}/bin/sonar-scanner \
                             -Dsonar.projectKey=$DOCKER_IMAGE \
                             -Dsonar.sources=. \
+                            -Dsonar.host.url=$SONAR_HOST_URL \
+                            -Dsonar.login=$SONAR_TOKEN \
                             -Dsonar.sourceEncoding=UTF-8"
                     }
                 }
