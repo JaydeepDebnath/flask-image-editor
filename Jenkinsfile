@@ -2,7 +2,6 @@ pipeline {
     agent { label 'Jenkins-agent' }
     environment {
         DOCKER_IMAGE = 'flask-image-editor'
-        SONARQUBE_ENV = 'SonarQube'
     }   
     stages {
         stage("Cleanup Workspace") {
@@ -18,14 +17,16 @@ pipeline {
         stage("SonarQube code Analysis"){
             steps{
                 withSonarQubeEnv('SonarQube'){
-                    sh '''
-                    sonar-scaner \
-                    -Dsonar.projectKey=$DOCKER_IMAGE \
-                    -Dsonar.sources=.\
-                    -Dsonar.language=py \
-                    -Dsonar.sourceEncoding=UTF-8
-                    '''
-                }  
+                    script {
+                        def scannerHome = tool 'SonarScanner'
+                        sh "${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=$DOCKER_IMAGE \
+                            -Dsonar.sources=. \
+                            -Dsonar.language=py \
+                            -Dsonar.sourceEncoding=UTF-8"
+                        }
+                    }
+                }
             }
         }
         stage("Build Docker Image") {
