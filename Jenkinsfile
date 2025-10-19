@@ -22,25 +22,19 @@ pipeline {
                         sh "${scannerHome}/bin/sonar-scanner \
                             -Dsonar.projectKey=$DOCKER_IMAGE \
                             -Dsonar.sources=. \
-                            -Dsonar.language=py \
                             -Dsonar.sourceEncoding=UTF-8"
-                        }
                     }
                 }
             }
         }
         stage("Build Docker Image") {
             steps {
-                sh '''
-                docker build -t $DOCKER_IMAGE .
-                '''
+                sh "docker build -t $DOCKER_IMAGE ."
             }
         }
-        stage("RUN Flask app"){
+        stage("Run Flask App"){
             steps{
-                sh '''
-                docker run -d -p 5000:5000 $DOCKER_IMAGE
-                '''
+                sh "docker run -d -p 5000:5000 --name flask-app $DOCKER_IMAGE"
             }
         }
     }
