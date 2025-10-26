@@ -2,7 +2,7 @@ pipeline {
     agent { label 'Jenkins-agent' }
     environment {
         DOCKER_IMAGE = 'flask-image-editor'
-        SONAR_TOKEN = credentials('SonarQube')
+        // SONAR_TOKEN = credentials('SonarQube')
     }   
     stages {
         stage("Cleanup Workspace") {
@@ -15,21 +15,21 @@ pipeline {
                 git branch: 'main', credentialsId: 'GitHub', url: 'https://github.com/JaydeepDebnath/flask-image-editor'
             }
         }
-        stage("SonarQube code Analysis"){
-            steps{
-                withSonarQubeEnv('SonarQube'){
-                    script {
-                        def scannerHome = tool 'SonarScanner'
-                        sh "${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=$DOCKER_IMAGE \
-                            -Dsonar.sources=. \
-                            -Dsonar.host.url=$SONAR_HOST_URL \
-                            -Dsonar.login=$SONAR_TOKEN \
-                            -Dsonar.sourceEncoding=UTF-8"
-                    }
-                }
-            }
-        }
+        // stage("SonarQube code Analysis"){
+        //     steps{
+        //         withSonarQubeEnv('SonarQube'){
+        //             script {
+        //                 def scannerHome = tool 'SonarScanner'
+        //                 sh "${scannerHome}/bin/sonar-scanner \
+        //                     -Dsonar.projectKey=$DOCKER_IMAGE \
+        //                     -Dsonar.sources=. \
+        //                     -Dsonar.host.url=$SONAR_HOST_URL \
+        //                     -Dsonar.login=$SONAR_TOKEN \
+        //                     -Dsonar.sourceEncoding=UTF-8"
+        //             }
+        //         }
+        //     }
+        // }
         stage("Build Docker Image") {
             steps {
                 sh "docker build -t $DOCKER_IMAGE ."
