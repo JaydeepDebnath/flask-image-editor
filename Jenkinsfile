@@ -1,44 +1,78 @@
 pipeline {
     agent { label 'Jenkins-agent' }
+
     environment {
-        DOCKER_IMAGE = 'flask-image-editor'
-        SONAR_TOKEN = credentials('jenkins-sonarqube-token')
-    }   
+        APP_NAME = "flask-image-editor"
+        RELEASE = "1.0.0"
+        DOCKER_IMAGE = "jay0604/${APP_NAME}"
+        IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
+        SONARQUBE_ENV = "sonarQube-server" 
+    }
+
     stages {
+
         stage("Cleanup Workspace") {
             steps {
                 cleanWs()
             }
         }
+
         stage("Checkout from SCM") {
             steps {
                 git branch: 'main', credentialsId: 'GitHub', url: 'https://github.com/JaydeepDebnath/flask-image-editor'
             }
         }
-        stage("SonarQube code Analysis"){
-            steps{
-                withSonarQubeEnv('SonarQube'){
+
+        stage("SonarQube Code Analysis") {
+            steps {
+                withSonarQubeEnv("${SONARQUBE_ENV}") {
                     script {
                         def scannerHome = tool 'SonarScanner'
-                        sh "${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=$DOCKER_IMAGE \
-                            -Dsonar.sources=. \
-                            -Dsonar.host.url=$SONAR_HOST_URL \
-                            -Dsonar.login=$SONAR_TOKEN \
-                            -Dsonar.sourceEncoding=UTF-8"
+                        sh """
+                            ${scannerHome}/bin/sonar-scanner \
+                                -Dsonar.projectKey=${APP_NAME} \
+                                -Dsonar.sources=. \
+                                -Dsonar.host.url=$SONAR_HOST_URL \
+                                -Dsonar.login=$SONAR_AUTH_TOKEN \
+                                -Dsonar.sourceEncoding=UTF-8
+                        """
                     }
                 }
             }
         }
+
         stage("Build Docker Image") {
             steps {
-                sh "docker build -t $DOCKER_IMAGE ."
+                sh """
+                    docker build -t ${DOCKER_IMAGE}:${IMAGE_TAG} .
+                """
             }
         }
-        stage("Run Flask App"){
-            steps{
-                sh "docker run -d -p 5000:5000 --name flask-app $DOCKER_IMAGE"
+
+        stage("Push Docker Image to DockerHub") {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                    sh """
+                        echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                        docker push ${DOCKER_IMAGE}:${IMAGE_TAG}
+                    """
+                }
             }
+        }
+
+        stage("Run Flask App in Container") {
+            steps {
+                sh """
+                    docker rm -f flask-app || true
+                    docker run -d -p 5000:5000 --name flask-app ${DOCKER_IMAGE}:${IMAGE_TAG}
+                """
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline execution completed."
         }
     }
 }
