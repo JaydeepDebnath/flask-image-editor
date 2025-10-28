@@ -35,7 +35,9 @@ pipeline {
                                 -Dsonar.projectBaseDir=. \
                                 -Dsonar.sourceEncoding=UTF-8 \
                                 -Dsonar.language=py \
-                                -Dsonar.exclusion=**/templates/**,**/static/**,**/uploads/**,**/venv/**,**/*.html
+                                -Dsonar.exclusion=**/templates/**,**/static/**,**/uploads/**,**/venv/**,**/*.html \
+                                -Dsonar.javascript.enable=false \
+                                -Dsonar.css.enable=false
                         """
                     }
                 }
