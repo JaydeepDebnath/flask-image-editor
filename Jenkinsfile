@@ -32,8 +32,7 @@ pipeline {
                             ${scannerHome}/bin/sonar-scanner \
                                 -Dsonar.projectKey=${APP_NAME} \
                                 -Dsonar.sources=. \
-                                -Dsonar.host.url=$SONAR_HOST_URL \
-                                -Dsonar.login=$SONAR_AUTH_TOKEN \
+                                -Dsonar.projectBaseDir=. \
                                 -Dsonar.sourceEncoding=UTF-8
                         """
                     }
