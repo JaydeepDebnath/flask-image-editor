@@ -30,16 +30,15 @@ pipeline {
                         def scannerHome = tool 'SonarScanner'
                         sh """
                             ${scannerHome}/bin/sonar-scanner \
-                                -Dsonar.projectKey=${APP_NAME} \
-                                -Dsonar.sources=. \
-                                -Dsonar.projectBaseDir=. \
-                                -Dsonar.sourceEncoding=UTF-8 \
-                                -Dsonar.language=py \
-                                -Dsonar.exclusion=**/templates/**,**/static/**,**/uploads/**,**/venv/**,**/*.html \
-                                -Dsonar.javascript.enable=false \
-                                -Dsonar.css.enable=false \
-                                -Dsonar.nodejs.executable=false
-                        """
+                            -Dsonar.projectKey=${APP_NAME} \
+                            -Dsonar.sources=. \
+                            -Dsonar.projectBaseDir=. \
+                            -Dsonar.sourceEncoding=UTF-8 \
+                            -Dsonar.language=py \
+                            -Dsonar.exclusions=**/templates/**,**/static/**,**/uploads/**,**/venv/**,**/*.html,**/*.js,**/*.css \
+                            -Dsonar.javascript.enabled=false \
+                            -Dsonar.css.enabled=false
+                        """ 
                     }
                 }
             }
