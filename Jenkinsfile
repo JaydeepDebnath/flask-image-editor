@@ -33,7 +33,9 @@ pipeline {
                                 -Dsonar.projectKey=${APP_NAME} \
                                 -Dsonar.sources=. \
                                 -Dsonar.projectBaseDir=. \
-                                -Dsonar.sourceEncoding=UTF-8
+                                -Dsonar.sourceEncoding=UTF-8 \
+                                -Dsonar.language=py \
+                                -Dsonar.exclusion=**/templates/**,**/static/**,**/uploads/**,**/venv/**,**/*.html
                         """
                     }
                 }
