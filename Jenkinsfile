@@ -37,7 +37,8 @@ pipeline {
                                 -Dsonar.language=py \
                                 -Dsonar.exclusion=**/templates/**,**/static/**,**/uploads/**,**/venv/**,**/*.html \
                                 -Dsonar.javascript.enable=false \
-                                -Dsonar.css.enable=false
+                                -Dsonar.css.enable=false \
+                                -Dsonar.nodejs.executable=false
                         """
                     }
                 }
