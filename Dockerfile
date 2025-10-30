@@ -23,4 +23,4 @@ ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_ENV=production
 ENV FLASK_DEBUG=0
 
-CMD ["flask", "main.py"]
+CMD ["flask", "run"]
