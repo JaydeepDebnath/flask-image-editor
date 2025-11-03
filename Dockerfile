@@ -18,6 +18,8 @@ COPY . .
 
 EXPOSE 5000
 
+RUN mkdir -p uploads static
+
 ENV FLASK_APP=main
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV FLASK_ENV=production
